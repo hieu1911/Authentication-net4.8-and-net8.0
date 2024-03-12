@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace LoginAndChatRealTime.Controllers
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "CookieAuthentication")]
     public class MessageController : Controller
     {
         private readonly IHttpContextAccessor _context;

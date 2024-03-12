@@ -4,11 +4,8 @@ using LoginAndChatRealTime.Interfaces;
 using LoginAndChatRealTime.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Synercoding.FormsAuthentication;
 using System;
-using static System.Collections.Specialized.BitVector32;
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -17,9 +14,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.WithOrigins("https://localhost:7213", "https://localhost:44394").AllowAnyHeader()
-                                                  .AllowAnyMethod()
-                                                  .AllowCredentials();
+                          policy.WithOrigins("https://localhost:44394")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
                       });
 });
 
@@ -37,7 +35,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSignalR();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+    .AddCookie("CookieAuthentication",options =>
     {
         options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
         options.SlidingExpiration = true;
@@ -49,6 +47,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                         FormsAuthHelper.ConvertCookieToTicket,
                         FormsAuthHelper.ConvertTicketToCookie
                     );
+    })
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Login";
     });
 
 

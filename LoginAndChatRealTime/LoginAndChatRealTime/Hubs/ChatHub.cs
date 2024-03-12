@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace LoginAndChatRealTime.Hubs
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "CookieAuthentication")]
     public class ChatHub : Hub
     {
         private IMessageSerivce _messageService;
