@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@model HomeViewModel
+
+<style>
+    .message-wrapper {
+        width: 660px;
+    }
+    
+    .avatar {
+        background-color: #0d99ff;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
+    .message-item {
+        cursor: pointer;
+    }
+
+    a {
+        text-decoration: none;
+    }
+</style>
+
+<div class="d-flex justify-content-center">
+    <div class="message-wrapper">
+        <h3 class="text-center mb-3">Rooms</h3>
+        @foreach (var room in Model.Rooms)
+        {
+            <a href="@Url.Action("Index","Message", new {roomName = room.RoomName, roomId = room.RoomId})">
+                <div class="d-flex text-center mb-2 message-item" id="message-item">
+                    <span class="avatar">@room.RoomName[0]</span>
+                    <span class="text-center d-inline-flex align-items-center">@room.RoomName</span>
+                </div>
+            </a>
+        }
+    </div>
+</div>
+
+@* <script src="~/js/signalr/dist/browser/signalr.js"></script> *@
+<script src="~/lib/jquery/dist/jquery.js"></script>
+
+<script>
+
+</script>

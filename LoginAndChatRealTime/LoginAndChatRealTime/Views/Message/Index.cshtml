@@ -1,0 +1,112 @@
+﻿@model MessageViewModel
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+
+}
+
+<style>
+    .message-wrapper {
+        width: 660px;
+    }
+
+    .avatar {
+        background-color: #0d99ff;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
+    .message-list {
+        height: 480px;
+        overflow-y: scroll;
+    }
+
+    ul {
+        list-style: none;
+    }
+
+    li {
+        margin: 4px 0;
+    }
+
+    .sender-message {
+        text-align-last: right;
+    }
+</style>
+
+<div class="d-flex justify-content-center">
+    <div class="message-wrapper">
+        <h3 class="text-center mb-3">Message</h3>
+        <div class="d-flex text-center mb-2">
+            <span class="avatar">@Model.Room.RoomName[0]</span>
+            <span class="text-center d-inline-flex align-items-center">@Model.Room.RoomName</span>
+        </div>
+        <hr/>
+        <ul class="message-list" id="message-list">
+            @foreach (var message in Model.Messages)
+            {
+                @if (Model.User.UserId == message.UserId)
+                {
+                    <li class="sender-message">@message.Content</li>
+                }
+                else
+                {
+                    <li>@message.User.UserName: @message.Content</li>
+                }
+            }
+        </ul>
+        <div class="d-flex">
+            <input class="form-control me-2" id="message"/>
+            <button class="btn btn-primary" id="btn-send">Send</button>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+
+<script>
+    var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+    var roomName = @Html.Raw(Json.Serialize(Model.Room.RoomName));
+    var userId = @Html.Raw(Json.Serialize(Model.User.UserId));
+
+    $("#btn-send").prop("disabled", true)
+
+    connection.on("ReceiveMessage", function (userName, message, id) {
+        var li = document.createElement("li");
+
+        if (userId == id) {
+            li.textContent = message;
+            li.classList.add("sender-message");
+        }
+        else
+        {
+            li.textContent = `${userName}: ${message}`
+        }
+
+        $("#message-list").append(li);
+    });
+
+    connection.start().then(function () {
+        $("#btn-send").prop("disabled", false)
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
+
+    $("#btn-send").on("click", function (event) {
+        var message = $("#message").val();
+        connection.invoke("SendMessageToGroup", roomName, message).catch(function (err) {
+            return console.error(err.toString());
+        });
+        event.preventDefault();
+    });
+</script>
